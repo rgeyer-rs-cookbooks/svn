@@ -44,11 +44,14 @@ user node[:svn][:uid] do
   shell "/bin/sh"
 end
 
-[node[:svn][:svn_home], ::File.join(node[:svn][:svn_home],"repositories")].each do |dir|
-  directory dir do
-    recursive true
-    mode "0775"
-  end
+
+execute "Enforce ownership of #{node[:svn][:uid]}:#{node[:svn][:gid]} on #{node[:svn][:svn_home]}" do
+  command "chown -R #{node[:svn][:uid]}:#{node[:svn][:gid]} #{node[:svn][:svn_home]}"
+end
+
+directory ::File.join(node[:svn][:svn_home],"repositories") do
+  recursive true
+  mode "0775"
 end
 
 rightscale_marker :end
